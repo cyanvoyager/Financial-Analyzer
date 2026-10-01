@@ -10,19 +10,19 @@
 
 
 company1 = [
-    {"description": "Client A", "amount": 100000, "type": "revenue"},
-    {"description": "Rent", "amount": 30000, "type": "expense"},
-    {"description": "Client B", "amount": 75000, "type": "revenue"},
-    {"description": "Electricity", "amount": 12000, "type": "expense"}
+    {"date": "2026-02-27", "description": "Client A", "amount": 100000, "type": "revenue"},
+    {"date": "2026-01-13", "description": "Rent", "amount": 30000, "type": "expense"},
+    {"date": "2026-05-21", "description": "Client B", "amount": 75000, "type": "revenue"},
+    {"date": "2026-05-06", "description": "Electricity", "amount": 12000, "type": "expense"}
 ]
 
 company2 = [
-    {"description": "Client X retainer", "amount": 125000, "type": "revenue"},
-    {"description": "Software subscriptions", "amount": 18500, "type": "expense"},
-    {"description": "Consulting fees", "amount": 90000, "type": "revenue"},
-    {"description": "Internet & utilities", "amount": 9500, "type": "expense"},
-    {"description": "Office supplies", "amount": 6200, "type": "expense"},
-    {"description": "Project milestone payout", "amount": 60000, "type": "revenue"},
+    {"date": "2026-04-25", "description": "Client X retainer", "amount": 125000, "type": "revenue"},
+    {"date": "2026-03-13", "description": "Software subscriptions", "amount": 18500, "type": "expense"},
+    {"date": "2026-02-22", "description": "Consulting fees", "amount": 90000, "type": "revenue"},
+    {"date": "2026-02-14", "description": "Internet & utilities", "amount": 9500, "type": "expense"},
+    {"date": "2026-08-05", "description": "Office supplies", "amount": 6200, "type": "expense"},
+    {"date": "2026-01-17", "description": "Project milestone payout", "amount": 60000, "type": "revenue"}
 ]
 
 companies=[company1,company2]
@@ -51,14 +51,15 @@ def analyze_transactions(transactions):
     return {"revenue":total_revenue,
             "expense":total_expenses, 
             "profit":profit,
-            "profit margin":profit_margin}
+            "profit margin":profit_margin,
+            }
 
 
 
 for company in companies:
-    analysis1=analyze_transactions(company)
+    analysis=analyze_transactions(company)
     # print(f"Company analysis: {analysis1}")
-    print(f"Company analysis: \nRevenue: {analysis1['revenue']} \nExpense: {analysis1['expense']} \nProfit: {analysis1['profit']} \nProfit Margin: {analysis1['profit margin']} ") 
+    print(f"Company analysis: \nDate: {analysis['date']} \nRevenue: {analysis['revenue']} \nExpense: {analysis['expense']} \nProfit: {analysis['profit']} \nProfit Margin: {analysis['profit margin']:.2f} % ") 
 # analysis2=analyze_transactions(company2)
 
 # print(analysis2)
