@@ -25,41 +25,59 @@ company2 = [
     {"date": "2026-01-17", "description": "Project milestone payout", "amount": 60000, "type": "revenue"}
 ]
 
+
 companies=[company1,company2]
 
 
-def analyze_transactions(transactions):
-    total_revenue=0
-    total_expenses=0
+def transactions_by_month(company,month):
+    for transaction in company:
+        if transaction ["date"][:7]==month  :
+            print(f"Date: {transaction['date']} Description: {transaction['description']} Amount: {transaction['amount']} Type: {transaction['type']}")
 
-    for transaction in transactions:
-        if transaction["type"]=="revenue":
-            total_revenue=total_revenue+ transaction["amount"]
+transactions_by_month(company1,"2026-02")
 
-        elif transaction["type"]=="expense":
-            total_expenses=total_expenses+transaction["amount"]
+# def analyze_transactions(transactions,month):
+#     total_revenue=0
+#     total_expenses=0
 
+#     for transaction in transactions:
+#         if transaction["type"]=="revenue":
+#             total_revenue=total_revenue+ transaction["amount"]
 
-    profit=total_revenue-total_expenses
-
-    if total_revenue !=0  :
-            profit_margin=(profit/total_revenue)*100
-    else:
-        profit_margin="Undefined"
-
-    # print(f"Revenue: {total_revenue} \nExpenses: {total_expenses} \nProfit: {profit} \n Profit margin: {profit_margin}")
-    return {"revenue":total_revenue,
-            "expense":total_expenses, 
-            "profit":profit,
-            "profit margin":profit_margin,
-            }
+#         elif transaction["type"]=="expense":
+#             total_expenses=total_expenses+transaction["amount"]
 
 
 
-for company in companies:
-    analysis=analyze_transactions(company)
+#     profit=total_revenue-total_expenses
+
+#     if total_revenue !=0  :
+#             profit_margin=(profit/total_revenue)*100
+#     else:
+#         profit_margin="Undefined"
+
+#     # print(f"Revenue: {total_revenue} \nExpenses: {total_expenses} \nProfit: {profit} \n Profit margin: {profit_margin}")
+#     if transaction["date"][5:7]==month:
+#         return {"revenue":total_revenue,
+#                 "expense":total_expenses, 
+#                 "profit":profit,
+#                 "profit margin":profit_margin,
+#                 }
+
+
+
+# for company in companies:
+#     analysis=analyze_transactions(company,"02")
+
+
     # print(f"Company analysis: {analysis1}")
-    print(f"Company analysis: \nDate: {analysis['date']} \nRevenue: {analysis['revenue']} \nExpense: {analysis['expense']} \nProfit: {analysis['profit']} \nProfit Margin: {analysis['profit margin']:.2f} % ") 
-# analysis2=analyze_transactions(company2)
+    # print(f"Company analysis: \nDate: {analysis['date']} \nRevenue: {analysis['revenue']} \nExpense: {analysis['expense']} \nProfit: {analysis['profit']} \nProfit Margin: {analysis['profit margin']:.2f} % ") 
+    # print(company)
+    # for transaction in company:
+    #     #  print(transaction['date'])
+    #      mmyy_str=transaction['date']
+    #      mmyy=mmyy_str[5:7]
+    #      print(mmyy)
+
 
 # print(analysis2)
