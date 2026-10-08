@@ -34,14 +34,22 @@ def transactions_by_month(company,month):
     for transaction in company:
         if transaction ["date"][:7]==month  :
             # print(f"Date: {transaction['date']} Description: {transaction['description']} Amount: {transaction['amount']} Type: {transaction['type']}")
-            results.append({"date":transaction['date'],
-            "description":transaction['description'], 
-            "amount":transaction['amount'], 
-            "type":transaction['type'],})
+            results.append(transaction)
     return results
 
-filtered_transactions=transactions_by_month(company2,"2026-02")
-print(filtered_transactions)
+
+user_choice=input("Please input the company name:")
+period=input("Input the period (YYYY-MM):")
+
+if user_choice=="1" or user_choice=="company1":
+    comp=company1
+elif user_choice=="2" or user_choice=="company2":
+    comp=company2
+else:
+    comp=None
+    print("invalid company selected!")
+filtered_transactions=transactions_by_month(comp,period)
+# print(filtered_transactions)
 
 
 
