@@ -21,8 +21,8 @@ company2 = [
     {"date": "2026-04-25", "description": "Client X retainer", "amount": 125000, "type": "revenue"},
     {"date": "2026-03-13", "description": "Software subscriptions", "amount": 18500, "type": "expense"},
     {"date": "2026-02-22", "description": "Consulting fees", "amount": 90000, "type": "revenue"},
-    {"date": "2026-02-14", "description": "Internet & utilities", "amount": 9500, "type": "expense"},
-    {"date": "2026-08-05", "description": "Office supplies", "amount": 6200, "type": "expense"},
+    {"date": "2026-02-14", "description": "Internet & utilities", "amount": "nine hundred", "type": "expense"},
+    {"date": "2026-08-05", "description": "Office supplies", "amount": -6200, "type": "expense"},
     {"date": "2026-01-17", "description": "Project milestone payout", "amount": 60000, "type": "revenue"}
 ]
 
@@ -52,6 +52,13 @@ def validate_transaction(transactions):
         if t['type'] not in ('expense','revenue'):
             print(f"Transaction of type '{t['type']}' is invalid!")
             return False
+        if type(t['amount'])==str:
+            print(F"The transaction value '{t['amount']}' should be an INTEGER ")
+            return False
+        if t['amount']<0 :
+            print(f"The amount '{t['amount']}' must be positive")
+            return False
+        
     return True
             
 
@@ -102,11 +109,23 @@ comp=companies.get(user_choice)
 
 if comp is not None:
     filtered_transactions=transactions_by_month(comp,period)
+    #checks whether the 'filtered_transactions' list is empty.(works the same as if 'len(filtered_transactios)==0:'. An empty list evaluates to false)
     if not filtered_transactions:
-        print("No transactions to be shown.")
+        print(f"No transactions to be shown within period {period}")
     else:
-        for individual_transaction in filtered_transactions:
-            print(f"{individual_transaction['date']} | {individual_transaction['description']} | {individual_transaction['amount']:,.2f} | {individual_transaction['type']}")
+        if validate_transaction(filtered_transactions):
+            for individual_transaction in filtered_transactions:
+                print(f"{individual_transaction['date']} | {individual_transaction['description']} | {individual_transaction['amount']:,.2f} | {individual_transaction['type']}")
+                analysis=analyze_transactions(filtered_transactions)
+                if analysis is not None:
+                    if analysis['profit margin']=="Undefined":
+                        margin_text="Undefined"
+                    else:
+                        margin_text=f"{analysis['profit margin']:.2f}%"
+                    print(f"Financial Report\n {user_choice} - {period} \n Revenue \t {analysis['revenue']:,.2f}\n Expenses\t {analysis['expenses']:,.2f} \n Net Profit \t {analysis['profit']:,.2f}\n Profit Margin\t {margin_text}")
+                else:
+                    print("Aborting transaction...")
+
 else:
     print("Company selected doesn't exist!")
 
@@ -118,32 +137,12 @@ else:
 #     comp=None
 #     print("Company selected doesn't exist!")
 
-
-
-
-
-if comp is not None :
-    filtered_transactions=transactions_by_month(comp,period)
-    # print(len(filtered_transactions))
-    #checks whether the 'filtered_transactions' list is empty.(works the same as if 'len(filtered_transactios)==0:'. An empty list evaluates to false)
-    if not filtered_transactions :
-        print(f"No transactions found for period, {period}")
-    else:
         # for item in filtered_transactions:
             # if item['type']!='revenue' and item['type'] !='expense':
             #     print(f"Error: Transaction '{item['description']}' has an invalid type: '{item['type']}'")
             #     break
             # else:
-        if(validate_transaction(filtered_transactions)==True):
-            analysis=analyze_transactions(filtered_transactions)
-            if analysis is not None:
-                if analysis['profit margin']=="Undefined":
-                    margin_text="Undefined"
-                else:
-                    margin_text=f"{analysis['profit margin']:.2f}%"
-                print(f"Financial Report\n {user_choice} - {period} \n Revenue \t {analysis['revenue']:,.2f}\n Expenses\t {analysis['expenses']:,.2f} \n Net Profit \t {analysis['profit']:,.2f}\n Profit Margin\t {margin_text}")
-            else:
-                print("Aborting transaction...")
+
 
         # print(filtered_transactions)
 
