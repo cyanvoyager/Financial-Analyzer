@@ -1,4 +1,2 @@
-spam=['cat','dog']
-
-for i in spam:
-    print (i)
+amount = 90000
+print(f"{amount:,.2f}")

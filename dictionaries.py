@@ -26,8 +26,14 @@ company2 = [
     {"date": "2026-01-17", "description": "Project milestone payout", "amount": 60000, "type": "revenue"}
 ]
 
+# dictionary to access companies
+companies={
+    "company 1":company1,
+    "company 2":company2,
+    "1":company1,
+    "2":company2,
 
-companies=[company1,company2]
+}
 
 
 def transactions_by_month(company,month):
@@ -37,8 +43,16 @@ def transactions_by_month(company,month):
         if transaction ["date"][:7]==month  :
             # print(f"Date: {transaction['date']} Description: {transaction['description']} Amount: {transaction['amount']} Type: {transaction['type']}")
             results.append(transaction)
-            return results
+    return results
 
+ 
+
+def validate_transaction(transactions):
+    for t in transactions:
+        if t['type'] not in ('expense','revenue'):
+            print(f"Transaction of type '{t['type']}' is invalid!")
+            return False
+    return True
             
 
 
@@ -47,7 +61,11 @@ def analyze_transactions(transactions):
     total_revenue=0
     total_expenses=0
 
+
+
+    
     for transaction in transactions:
+        
         if transaction['type']=="revenue":
             total_revenue=total_revenue+ transaction["amount"]
 
@@ -75,16 +93,30 @@ def analyze_transactions(transactions):
             }
 
 
-user_choice=input("Please input the company name:")
-period=input("Input the period (YYYY-MM):")
+user_choice=input("Please input the company name:").strip().lower()
+period=input("Input the period (YYYY-MM):").strip().lower()
 
-if user_choice=="1" or user_choice=="company1":
-    comp=company1
-elif user_choice=="2" or user_choice=="company2":
-    comp=company2
+comp=companies.get(user_choice)
+
+
+
+if comp is not None:
+    filtered_transactions=transactions_by_month(comp,period)
+    if not filtered_transactions:
+        print("No transactions to be shown.")
+    else:
+        for individual_transaction in filtered_transactions:
+            print(f"{individual_transaction['date']} | {individual_transaction['description']} | {individual_transaction['amount']:,.2f} | {individual_transaction['type']}")
 else:
-    comp=None
     print("Company selected doesn't exist!")
+
+# if user_choice=="1" or user_choice=="company1":
+#     comp=company1
+# elif user_choice=="2" or user_choice=="company2":
+#     comp=company2
+# else:
+#     comp=None
+#     print("Company selected doesn't exist!")
 
 
 
@@ -102,15 +134,16 @@ if comp is not None :
             #     print(f"Error: Transaction '{item['description']}' has an invalid type: '{item['type']}'")
             #     break
             # else:
-        analysis=analyze_transactions(filtered_transactions)
-        if analysis is not None:
-            if analysis['profit margin']=="Undefined":
-                margin_text="Undefined"
+        if(validate_transaction(filtered_transactions)==True):
+            analysis=analyze_transactions(filtered_transactions)
+            if analysis is not None:
+                if analysis['profit margin']=="Undefined":
+                    margin_text="Undefined"
+                else:
+                    margin_text=f"{analysis['profit margin']:.2f}%"
+                print(f"Financial Report\n {user_choice} - {period} \n Revenue \t {analysis['revenue']:,.2f}\n Expenses\t {analysis['expenses']:,.2f} \n Net Profit \t {analysis['profit']:,.2f}\n Profit Margin\t {margin_text}")
             else:
-                margin_text=f"{analysis['profit margin']:.2f}%"
-            print(f"Financial Report\n {user_choice} - {period} \n Revenue \t {analysis['revenue']}\n Expenses\t {analysis['expenses']} \n Net Profit \t {analysis['profit']}\n Profit Margin\t {margin_text}")
-        else:
-            print("Aborting transaction")
+                print("Aborting transaction...")
 
         # print(filtered_transactions)
 
