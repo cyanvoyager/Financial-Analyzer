@@ -9,12 +9,15 @@
 # print(f"The profit is  {profit}")
 
 
+from datetime import datetime
+
 company1 = [
     {"date": "2026-02-27", "description": "Client A", "amount": 100000, "type": "revenue"},
     {"date": "2026-02-27", "description": "Client A", "amount": 100000, "type": "expense"},
     {"date": "2026-01-13", "description": "Rent", "amount": 30000, "type": "expenseses"},
     {"date": "2026-05-21", "description": "Client B", "amount": 75000, "type": "revenue"},
-    {"date": "2026-05-06", "description": "Electricity", "amount": 12000, "type": "expense"}
+    {"date": "2026-05-06", "description": "Electricity", "amount": 12000, "type": "expense"},
+    {"date": "2026-09-23",  "amount": 12000, "type": "expense"}
 ]
 
 company2 = [
@@ -23,8 +26,12 @@ company2 = [
     {"date": "2026-02-22", "description": "Consulting fees", "amount": 90000, "type": "revenue"},
     {"date": "2026-02-14", "description": "Internet & utilities", "amount": "nine hundred", "type": "expense"},
     {"date": "2026-08-05", "description": "Office supplies", "amount": -6200, "type": "expense"},
-    {"date": "2026-01-17", "description": "Project milestone payout", "amount": 60000, "type": "revenue"}
+    {"date": "17-01-2026", "description": "Project milestone payout", "amount": 60000, "type": "revenue"},
+    {"date": "2026-01-20", "description": "Electricity", "amount": 18000, "type": "expense"},
 ]
+
+
+
 
 # dictionary to access companies
 companies={
@@ -38,22 +45,69 @@ companies={
 
 def transactions_by_month(company,month):
     results=[]
+    all_formats=["%d-%m-%Y","%Y/%m/%d","%d/%m/%Y"]
     for transaction in company:
         
         if transaction ["date"][:7]==month  :
             # print(f"Date: {transaction['date']} Description: {transaction['description']} Amount: {transaction['amount']} Type: {transaction['type']}")
             results.append(transaction)
+            # If standard prefix didn't match, check alternative date formats
+        for fmt in all_formats:
+            try:
+                parsed=datetime.strptime(transaction["date"],fmt)
+                if parsed.strftime("%Y-%m")==month:
+                    results.append(transaction)
+                    break
+            except ValueError:
+                continue
     return results
 
  
 
-def validate_transaction(transactions):
+def validate_transaction(transactions,target_period):
+    transaction_keys=["date","description","amount","type"]
+    alt_formats=["%d-%m-%Y","%Y/%m/%d","%d/%m/%Y"]
+
     for t in transactions:
-        if t['type'] not in ('expense','revenue'):
-            print(f"Transaction of type '{t['type']}' is invalid!")
+        for key in transaction_keys:
+            if key not in t:
+                print(f"The following required item '{key}' is not among the transaction attributes!")
+                return False
+
+        #Checking to ensure the strict YYYY-MM-DD format is followed
+        is_strict_format=False
+        parsed_date=None
+        try:
+            parsed_date=datetime.strptime(t["date"], "%Y-%m-%d")
+            is_strict_format=True
+        except ValueError:
+            for fmt in alt_formats:
+                try:
+                    parsed_date=datetime.strptime(t["date"],fmt)
+                    break
+                except ValueError:
+                    continue
+        
+        if parsed_date is None:
+            print(f"Error: Unrecognized date format in '{t['transaction']}")
             return False
-        if type(t['amount'])==str:
-            print(F"The transaction value '{t['amount']}' should be an INTEGER ")
+
+
+        transaction_period=parsed_date.strftime("%Y-%m")
+
+
+        #Reject the non-standard format
+        if transaction_period==target_period:
+            if not is_strict_format:
+                print(f"Error: Invalid date format '{t['date']}' in '{t['description']}'. Expected format 'YYYY-MM-DD'")
+                return None
+            
+        if t['type'] not in ('expense','revenue'):
+            print(f"Error: Invalid type '{t['type']}' in transaction '{t['description']}'")
+            return False
+        # How it works- isinstance(object, type)
+        if not isinstance(t['amount'],(int,float) or isinstance(t['amount'],bool)):
+            print(f"The transaction value '{t['amount']}'. Amount must be numeric.")
             return False
         if t['amount']<0 :
             print(f"The amount '{t['amount']}' must be positive")
@@ -68,9 +122,6 @@ def analyze_transactions(transactions):
     total_revenue=0
     total_expenses=0
 
-
-
-    
     for transaction in transactions:
         
         if transaction['type']=="revenue":
@@ -113,7 +164,7 @@ if comp is not None:
     if not filtered_transactions:
         print(f"No transactions to be shown within period {period}")
     else:
-        if validate_transaction(filtered_transactions):
+        if validate_transaction(filtered_transactions,period):
             for individual_transaction in filtered_transactions:
                 print(f"{individual_transaction['date']} | {individual_transaction['description']} | {individual_transaction['amount']:,.2f} | {individual_transaction['type']}")
                 analysis=analyze_transactions(filtered_transactions)
