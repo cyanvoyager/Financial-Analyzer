@@ -13,11 +13,12 @@ from datetime import datetime
 
 company1 = [
     {"date": "2026-02-27", "description": "Client A", "amount": 100000, "type": "revenue"},
-    {"date": "2026-02-27", "description": "Client A", "amount": 100000, "type": "expense"},
+    { "description": "Client A", "amount": 100000, "type": "expense"},
     {"date": "2026-01-13", "description": "Rent", "amount": 30000, "type": "expenseses"},
     {"date": "2026-05-21", "description": "Client B", "amount": 75000, "type": "revenue"},
     {"date": "2026-05-06", "description": "Electricity", "amount": 12000, "type": "expense"},
-    {"date": "2026-09-23",  "amount": 12000, "type": "expense"}
+    {"date": "19/4/2026", "description": "Parking fees", "amount": 4800, "type": "expense"},
+    {"date": "2026-09-23",  "amount": 12000, "type": "expense"},
 ]
 
 company2 = [
@@ -42,27 +43,6 @@ companies={
 
 }
 
-
-def transactions_by_month(company,month):
-    results=[]
-    all_formats=["%d-%m-%Y","%Y/%m/%d","%d/%m/%Y"]
-    for transaction in company:
-        
-        if transaction ["date"][:7]==month  :
-            # print(f"Date: {transaction['date']} Description: {transaction['description']} Amount: {transaction['amount']} Type: {transaction['type']}")
-            results.append(transaction)
-            # If standard prefix didn't match, check alternative date formats
-        for fmt in all_formats:
-            try:
-                parsed=datetime.strptime(transaction["date"],fmt)
-                if parsed.strftime("%Y-%m")==month:
-                    results.append(transaction)
-                    break
-            except ValueError:
-                continue
-    return results
-
- 
 
 def validate_transaction(transactions,target_period):
     transaction_keys=["date","description","amount","type"]
@@ -89,7 +69,7 @@ def validate_transaction(transactions,target_period):
                     continue
         
         if parsed_date is None:
-            print(f"Error: Unrecognized date format in '{t['transaction']}")
+            print(f"Error: Unrecognized date format in '{t['description']}")
             return False
 
 
@@ -106,7 +86,7 @@ def validate_transaction(transactions,target_period):
             print(f"Error: Invalid type '{t['type']}' in transaction '{t['description']}'")
             return False
         # How it works- isinstance(object, type)
-        if not isinstance(t['amount'],(int,float) or isinstance(t['amount'],bool)):
+        if not isinstance(t['amount'],(int,float)) or (isinstance(t['amount'],bool)):
             print(f"The transaction value '{t['amount']}'. Amount must be numeric.")
             return False
         if t['amount']<0 :
@@ -114,7 +94,46 @@ def validate_transaction(transactions,target_period):
             return False
         
     return True
+
             
+
+
+def transactions_by_month(company,month):
+    results=[]
+    alt_formats=["%d-%m-%Y","%Y/%m/%d","%d/%m/%Y"]
+    for transaction in company:
+        if "date" not in transaction:
+            print(f"Error:Transaction '{transaction.get('description','Unknown')}' is missing the date field")
+            return False
+
+        if transaction ['date'][:7]==month :
+            results.append(transaction)
+
+
+    
+        # for fmt in alt_formats:
+        #     try:
+        #         parsed=datetime.strptime(transaction["date"],fmt)
+        #         if parsed.strftime("%Y-%m")==month:
+        #             results.append(transaction)
+        #         break
+        #     except ValueError:
+        #         continue
+
+
+        # if transaction ["date"][:7]==month  :
+        #     # print(f"Date: {transaction['date']} Description: {transaction['description']} Amount: {transaction['amount']} Type: {transaction['type']}")
+        #     results.append(transaction)
+        #     # If standard prefix didn't match, check alternative date formats
+        # for fmt in all_formats:
+        #     try:
+        #         parsed=datetime.strptime(transaction["date"],fmt)
+        #         if parsed.strftime("%Y-%m")==month:
+        #             results.append(transaction)
+        #             break
+        #     except ValueError:
+        #         continue
+    return results
 
 
 
@@ -132,7 +151,7 @@ def analyze_transactions(transactions):
         else:
             print( f"Transaction type '{transaction['type']}' is invalid!")
             # exit()
-            return None
+            return False
 
 
 
