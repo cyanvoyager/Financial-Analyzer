@@ -80,7 +80,7 @@ def validate_transaction(transactions,target_period):
         if transaction_period==target_period:
             if not is_strict_format:
                 print(f"Error: Invalid date format '{t['date']}' in '{t['description']}'. Expected format 'YYYY-MM-DD'")
-                return None
+                return False
             
         if t['type'] not in ('expense','revenue'):
             print(f"Error: Invalid type '{t['type']}' in transaction '{t['description']}'")
@@ -102,9 +102,9 @@ def transactions_by_month(company,month):
     results=[]
     alt_formats=["%d-%m-%Y","%Y/%m/%d","%d/%m/%Y"]
     for transaction in company:
-        if "date" not in transaction:
-            print(f"Error:Transaction '{transaction.get('description','Unknown')}' is missing the date field")
-            return False
+        # if "date" not in transaction:
+        #     print(f"Error:Transaction '{transaction.get('description','Unknown')}' is missing the date field")
+        #     return False
 
         if transaction ['date'][:7]==month :
             results.append(transaction)
@@ -178,23 +178,25 @@ comp=companies.get(user_choice)
 
 
 if comp is not None:
-    filtered_transactions=transactions_by_month(comp,period)
-    #checks whether the 'filtered_transactions' list is empty.(works the same as if 'len(filtered_transactios)==0:'. An empty list evaluates to false)
-    if not filtered_transactions:
-        print(f"No transactions to be shown within period {period}")
-    else:
-        if validate_transaction(filtered_transactions,period):
+    #Validate dataset FIRST i.e perform validation before looping through dates
+    if validate_transaction(comp,period):
+        #Only filter after validation proves all keys exist
+        filtered_transactions=transactions_by_month(comp,period)
+        #checks whether the 'filtered_transactions' list is empty.(works the same as if 'len(filtered_transactios)==0:'. An empty list evaluates to false)
+        if not filtered_transactions:
+            print(f"No transactions to be shown within period {period}")
+        else:
             for individual_transaction in filtered_transactions:
                 print(f"{individual_transaction['date']} | {individual_transaction['description']} | {individual_transaction['amount']:,.2f} | {individual_transaction['type']}")
-                analysis=analyze_transactions(filtered_transactions)
-                if analysis is not None:
-                    if analysis['profit margin']=="Undefined":
-                        margin_text="Undefined"
-                    else:
-                        margin_text=f"{analysis['profit margin']:.2f}%"
-                    print(f"Financial Report\n {user_choice} - {period} \n Revenue \t {analysis['revenue']:,.2f}\n Expenses\t {analysis['expenses']:,.2f} \n Net Profit \t {analysis['profit']:,.2f}\n Profit Margin\t {margin_text}")
+            analysis=analyze_transactions(filtered_transactions)
+            if analysis is not None:
+                if analysis['profit margin']=="Undefined":
+                    margin_text="Undefined"
                 else:
-                    print("Aborting transaction...")
+                    margin_text=f"{analysis['profit margin']:.2f}%"
+                print(f"Financial Report\n {user_choice} - {period} \n Revenue \t {analysis['revenue']:,.2f}\n Expenses\t {analysis['expenses']:,.2f} \n Net Profit \t {analysis['profit']:,.2f}\n Profit Margin\t {margin_text}")
+            else:
+                print("Aborting transaction...")
 
 else:
     print("Company selected doesn't exist!")
