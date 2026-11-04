@@ -49,13 +49,12 @@ def validate_transaction(transactions,target_period):
     alt_formats=["%d-%m-%Y","%Y/%m/%d","%d/%m/%Y"]
 
     for t in transactions:
-        for key in transaction_keys:
-            if key not in t:
-                print(f"The following required item '{key}' is not among the transaction attributes!")
-                return False
 
         #Checking to ensure the strict YYYY-MM-DD format is followed
         is_strict_format=False
+        if not is_strict_format:
+            print(f"Error: Invalid date format '{t['date']}' in '{t['description']}'. Expected format 'YYYY-MM-DD'")
+            return False
         parsed_date=None
         try:
             parsed_date=datetime.strptime(t["date"], "%Y-%m-%d")
@@ -67,20 +66,26 @@ def validate_transaction(transactions,target_period):
                     break
                 except ValueError:
                     continue
+
+
         
         if parsed_date is None:
             print(f"Error: Unrecognized date format in '{t['description']}")
             return False
+
+        for key in transaction_keys:
+            if key not in t:
+                print(f"The following required item '{key}' is not among the transaction attributes!")
+                return False
 
 
         transaction_period=parsed_date.strftime("%Y-%m")
 
 
         #Reject the non-standard format
-        if transaction_period==target_period:
-            if not is_strict_format:
-                print(f"Error: Invalid date format '{t['date']}' in '{t['description']}'. Expected format 'YYYY-MM-DD'")
-                return False
+        ##############
+
+
             
         if t['type'] not in ('expense','revenue'):
             print(f"Error: Invalid type '{t['type']}' in transaction '{t['description']}'")
@@ -100,7 +105,6 @@ def validate_transaction(transactions,target_period):
 
 def transactions_by_month(company,month):
     results=[]
-    alt_formats=["%d-%m-%Y","%Y/%m/%d","%d/%m/%Y"]
     for transaction in company:
         # if "date" not in transaction:
         #     print(f"Error:Transaction '{transaction.get('description','Unknown')}' is missing the date field")
