@@ -68,10 +68,15 @@ def validate_transaction(transactions, target_period):
                 errors.append(f"-Missing '{key}' in: {desc}")
 
         if "date" in t:
-            try:
-                datetime.strptime(t["date"], "%Y-%m-%d")
-            except ValueError:
-                errors.append(f"-Invalid type '{t['date']}' in '{desc}'. Expected format 'YYYY-MM-DD'.")
+            if type(t["date"])!=str:
+                errors.append(
+                    f"-Invalid date '{t['date']}' in '{desc}'.Date must be text in 'YYYY-MM-DD' format."
+                )
+            else:
+                try:
+                    datetime.strptime(t["date"], "%Y-%m-%d")
+                except ValueError:
+                    errors.append(f"-Invalid type '{t['date']}' in '{desc}'. Expected format 'YYYY-MM-DD'.")
 
         if "type" in t:
             if t["type"] not in ("expense","revenue"):
