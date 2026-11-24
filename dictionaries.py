@@ -54,9 +54,8 @@ companies = {
 }
 
 
-def validate_transaction(transactions, target_period):
+def validate_transaction(transactions):
     transaction_keys = ["date", "description", "amount", "type"]
-    alt_formats = ["%d-%m-%Y", "%Y/%m/%d", "%d/%m/%Y"]
     errors=[]
 
     for i, t in enumerate (transactions,start=1):
@@ -66,6 +65,11 @@ def validate_transaction(transactions, target_period):
         for key in transaction_keys:
             if key not in t:
                 errors.append(f"-Missing '{key}' in: {desc}")
+                has_missing_keys=True
+
+        #Skips further checks on this transaction if KEY is missing
+        if has_missing_keys:
+            continue
 
         if "date" in t:
             if type(t["date"])!=str:
@@ -74,14 +78,21 @@ def validate_transaction(transactions, target_period):
                 )
             else:
                 try:
-                    datetime.strptime(t["date"], "%Y-%m-%d")
+                    
+                    parsed_date=datetime.strptime(t["date"], "%Y-%m-%d")
+                    #Checking that the date format is strict with zero padding
+                    if parsed_date.strftime("%Y-%m-%d")!=t['date']:
+                        errors.append(
+                            f"Invalid date '{t['date']}' in '{desc}'."
+                            "Expected format 'YYYY-MM-DD'."
+                        )
                 except ValueError:
-                    errors.append(f"-Invalid type '{t['date']}' in '{desc}'. Expected format 'YYYY-MM-DD'.")
+                    errors.append(f"-Invalid date '{t['date']}' in '{desc}'. Expected format 'YYYY-MM-DD'.")
 
         if "type" in t:
             if t["type"] not in ("expense","revenue"):
                 errors.append(
-                    f"-Invalid type '{t['type']}' in '{desc}'. Expected format 'YYYY-MM-DD'."
+                    f"-Invalid type '{t['type']}' in '{desc}'. Expected either ."
                 )
         if "amount" in t:
             if type(t["amount"]) not in (int,float):
@@ -229,7 +240,7 @@ comp = companies.get(user_choice)
 
 if comp is not None:
     # Validate dataset FIRST i.e perform validation before looping through dates
-    if validate_transaction(comp, period):
+    if validate_transaction(comp):
         # Only filter after validation proves all keys exist
         filtered_transactions = transactions_by_month(comp, period)
         # checks whether the 'filtered_transactions' list is empty.(works the same as if 'len(filtered_transactios)==0:'. An empty list evaluates to false)
@@ -240,7 +251,7 @@ if comp is not None:
                 print(
                     f"{individual_transaction['date']} | {individual_transaction['description']} | {individual_transaction['amount']:,.2f} | {individual_transaction['type']}")
             analysis = analyze_transactions(filtered_transactions)
-            if analysis is not None:
+            if analysis is False:
                 if analysis['profit margin'] == "Undefined":
                     margin_text = "Undefined"
                 else:
